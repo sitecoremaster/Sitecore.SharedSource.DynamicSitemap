@@ -166,9 +166,16 @@ namespace Sitecore.SharedSource.DynamicSitemap.Model
                 }
 
                 //url = url.Replace("//", "/");
-                url = !url.StartsWith("http://") 
-                    ? "http://" + url 
-                    : url;
+                if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+                {
+                    if (ForceHttps)
+                    {
+                        url = "https://" + url;
+                    } else
+                    {
+                        url = "http://" + url;
+                    }
+                }
                 
                 url += SitemapFilePath.Replace("//", "/");
 

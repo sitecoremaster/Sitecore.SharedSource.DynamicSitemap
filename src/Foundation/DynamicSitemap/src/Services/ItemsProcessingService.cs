@@ -20,26 +20,33 @@ namespace Sitecore.SharedSource.DynamicSitemap.Services
         {
             var urlElements = new List<UrlElement>();
 
-            foreach (var item in items)
+            if (sitemapSiteConfiguration == null)
+                return null;
+
+            Sitecore.Context.SetActiveSite(sitemapSiteConfiguration.Site.Name);
+
+            foreach (Item item in items)
             {
                 if (item.Versions.Count > 0)
                 {
-                    //if (DynamicSitemapHelper.IsWildcard(item))
-                    //{
-                    //    PrepareDynamicItems(item, sitemapSiteConfiguration, xml);
-                    //}
-
                     if (IsIncluded(item, sitemapSiteConfiguration))
                     {
                         sitemapSiteConfiguration.ItemsCount++;
 
-                        var url = LinkManager.GetItemUrl(item, options);
+                        string url = LinkManager.GetItemUrl(item, options);
+
+                        if (string.IsNullOrEmpty(url))
+                            continue;
+
                         url = DynamicSitemapHelper.EnsureHttpPrefix(url, sitemapSiteConfiguration.ForceHttps);
 
                         if (!String.IsNullOrEmpty(sitemapSiteConfiguration.ServerHost))
                         {
                             url = DynamicSitemapHelper.ReplaceHost(url, sitemapSiteConfiguration.ServerHost);
                         }
+
+                        if (string.IsNullOrEmpty(url))
+                            continue;
 
                         urlElements.Add(
                             new UrlElement()

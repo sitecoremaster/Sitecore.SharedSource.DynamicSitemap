@@ -21,14 +21,20 @@ namespace Sitecore.SharedSource.DynamicSitemap.Helpers
         /// <returns>Prepared url</returns>
         public static String ReplaceHost(string url, string serverHost)
         {
-            Uri uri = new Uri(url);
+            Uri uri = null;
+
+            if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
+            {
+                return string.Empty;
+            }
 
             UriBuilder builder = new UriBuilder(uri);
 
+            // Clean up Server Host (ex. https://www.sitecore.com to www.sitecore.com)
             serverHost = serverHost.Replace("http://", String.Empty)
-                                   .Replace("https://", String.Empty)
-                                   .Replace("/", String.Empty);
+                                   .Replace("https://", String.Empty).Trim(new char[] { '/' });
 
+            // Set host information to the defined host name
             builder.Host = serverHost;
 
             Uri result = builder.Uri;
@@ -56,6 +62,12 @@ namespace Sitecore.SharedSource.DynamicSitemap.Helpers
         /// <returns></returns>
         public static String EnsureHttpPrefix(String url, bool useHttps = false)
         {
+            Uri uri = null;
+            if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
+            {
+                return url;
+            }
+
             if (!url.StartsWith("http") && !url.StartsWith("https"))
             {
                 url = (useHttps ? "https" : "http") + url;

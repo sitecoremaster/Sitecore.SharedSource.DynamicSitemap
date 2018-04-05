@@ -17,26 +17,19 @@ namespace Sitecore.SharedSource.DynamicSitemap.Services
         /// <param name="sitemapSiteConfiguration">Sitemap site configuration</param>
         /// <param name="elements"></param>
         /// <returns>Sitemap content as string</returns>
-        public virtual String BuildSitemap(SitemapSiteConfiguration sitemapSiteConfiguration, List<UrlElement> elements)
+        public virtual String BuildSitemap(SitemapSiteConfiguration sitemapSiteConfiguration, IEnumerable<UrlElement> elements)
         {
             var result = String.Empty;
-
-            //var options = GetUrlOptions();
-
             var encoding = Encoding.UTF8;
             StringWriterWithEncoding stringWriter = new StringWriterWithEncoding(encoding);
 
             // - Creating the XML Header -
-
             var xml = new XmlTextWriter(stringWriter);
             xml.WriteStartDocument();
             xml.WriteStartElement("urlset", DynamicSitemapConfiguration.XmlnsTpl);
 
             try
             {
-                //options.Site = sitemapSiteConfiguration.Site;
-                //options.Language = sitemapSiteConfiguration.Language;
-
                 foreach (var urlElement in elements)
                 {
                     WriteUrlElement(urlElement, xml);

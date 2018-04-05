@@ -5,6 +5,6 @@ namespace Sitecore.SharedSource.DynamicSitemap.Services
 {
     public interface ISitemapBuildingService
     {
-        string BuildSitemap(SitemapSiteConfiguration sitemapSiteConfiguration, List<UrlElement> elements);
+        string BuildSitemap(SitemapSiteConfiguration sitemapSiteConfiguration, IEnumerable<UrlElement> elements);
     }
 }

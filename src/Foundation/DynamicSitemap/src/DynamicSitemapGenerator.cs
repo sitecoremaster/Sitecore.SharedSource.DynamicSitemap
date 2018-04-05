@@ -297,7 +297,7 @@ namespace Sitecore.SharedSource.DynamicSitemap
             foreach (var sitemapSiteConfiguration in SiteConfigurations)
             {
                 var items = _itemsRepository.GetItems(sitemapSiteConfiguration.Site.RootPath, sitemapSiteConfiguration.Language);
-                var urlElements = _itemsProcessingService.ProcessItems(items, sitemapSiteConfiguration, GetUrlOptions()); // TODO: watch for url options issues
+                IEnumerable<UrlElement> urlElements = _itemsProcessingService.ProcessItems(items, sitemapSiteConfiguration, GetUrlOptions()); // TODO: watch for url options issues
                 
                 var sitemapContent = _sitemapBuildingService.BuildSitemap(sitemapSiteConfiguration, urlElements);
 
@@ -335,7 +335,29 @@ namespace Sitecore.SharedSource.DynamicSitemap
                 foreach (var sitemap in SiteConfigurations)
                 {
                     xml.WriteStartElement("sitemap");
-                    xml.WriteElementString("loc", sitemap.SitemapUrl);
+                    string sitemapUrl = sitemap.SitemapUrl;
+
+                    if (!string.IsNullOrEmpty(sitemap.ServerHost))
+                    {
+                        UriBuilder builder = new UriBuilder(sitemap.SitemapUrl);
+
+                        if (builder == null)
+                            continue;
+
+                        builder.Host = sitemap.ServerHost;
+
+                        if (sitemap.ForceHttps && builder.Scheme == "http")
+                        {
+                            builder.Scheme = "https";
+                            builder.Port = -1;
+                        }
+
+                        builder.Path = builder.Path.Trim('/');
+
+                        sitemapUrl = builder.Uri.ToString();
+                    }
+
+                    xml.WriteElementString("loc", sitemapUrl);
 
                     var lastModified = DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:sszzz");
 
